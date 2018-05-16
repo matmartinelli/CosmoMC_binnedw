@@ -85,6 +85,7 @@
     type(CAMBParams)  P
     real(dl) neff_massive_standard, mnu, m1, m3, normal_frac
     real(dl), external :: Newton_raphson
+    integer :: i !MMmod
 
     P = this%CAMBP
     P%omegab = CMB%omb
@@ -104,6 +105,20 @@
     P%Nu_mass_numbers = 0
     P%Num_Nu_Massless = CMB%nnu
     P%share_delta_neff = .false.
+
+    !MMmod: binned w ----------------------------
+    P%nb=CMB%numbins
+    if (.not.allocated(P%zb)) allocate(P%zb(P%nb),P%wb(P%nb))
+    do i=1,P%nb
+       P%zb(i) = CMB%binz(i)
+       P%wb(i) = CMB%binw(i)
+    end do
+    P%corrlen=CMB%corr_l
+
+    P%s=CMB%smoothfactor
+    P%model=CMB%mode
+    !--------------------------------------------
+
     if (CMB%omnuh2>0) then
         call CAMB_SetNeutrinoHierarchy(P, CMB%omnuh2, CMB%omnuh2_sterile, CMB%nnu, &
             CosmoSettings%neutrino_hierarchy, CosmoSettings%num_massive_neutrinos)

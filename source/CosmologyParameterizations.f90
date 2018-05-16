@@ -329,6 +329,7 @@
         !MMmod: binned w-------------------------------------------------------------------
         CMB%numbins = init_nbin
         if (.not.allocated(CMB%binz)) allocate(CMB%binz(CMB%numbins),CMB%binw(CMB%numbins))
+
         j=1
         do i=1,CMB%numbins
            CMB%binz(i) = Params(16+j)
