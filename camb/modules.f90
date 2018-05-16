@@ -126,16 +126,16 @@
         integer   :: Nu_mass_numbers(max_nu) !physical number per eigenstate
 
 
-        !parameters for binning
-        integer   :: model                 !selects the specific model to use
-        real(dl)  :: startred, endred           !redshift limits for differential equation
-        real(dl)  :: w                        !working only with constant for now (effectively 2 bins). TO BE CHANGED
-        integer   :: nb                !number of redshift bins
-        real(dl)  :: s               !smoothing facto for tanh connection in binned functions
-        real(dl)  :: zb(maxbins)             !right margin of redshift bins (first left margin is always zero)
-        real(dl)  :: wb(maxbins)             !value of wb within each redshift bin
-        real(dl)  :: corrlen                    !correlation lenght for gaussian process reconstruction
-
+        !MMmod binned w--------------------------------------------------------------------------------
+        integer                              :: model                 !selects the specific model to use
+        real(dl)                             :: startred, endred      !redshift limits for differential equation
+!        real(dl)                             :: w                     !working only with constant for now (effectively 2 bins). TO BE CHANGED
+        integer                              :: nb                    !number of redshift bins
+        real(dl)                             :: s                     !smoothing facto for tanh connection in binned functions
+        real(dl), dimension(:), allocatable  :: zb                    !right margin of redshift bins (first left margin is always zero)
+        real(dl), dimension(:), allocatable  :: wb                    !value of wb within each redshift bin
+        real(dl)                             :: corrlen               !correlation lenght for gaussian process reconstruction
+        !----------------------------------------------------------------------------------------------
 
 
         integer   :: Scalar_initial_condition
