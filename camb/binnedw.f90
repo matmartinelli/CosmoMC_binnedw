@@ -72,7 +72,7 @@ use ModelParams
 
       subroutine get_integral_rhode(CP)
       Type(CAMBparams) CP
-      real(dl)              :: wde, rhode0, integral, wplus, wminus, wcazzo
+      real(dl)              :: wde, rhode0, integral, wplus, wminus
       integer,parameter     :: numint=1000, numarr=1000
       real(dl), dimension(numint) :: redint
       integer               :: i,j,k
@@ -101,7 +101,6 @@ use ModelParams
          end do
 
          rhodeint(j) = rhode0*exp(3._dl*integral)
-         call get_wofz(CP,1/(binned_z(j)),wcazzo)
       end do
 
       call newspline(binned_z,rhodeint, b2, c2, d2, nsteps)
@@ -122,7 +121,7 @@ use ModelParams
       if (z.le.binned_z(nsteps)) then
          rhode = ispline(z, binned_z, rhodeint, b2, c2, d2, nsteps)
       else
-         call get_wofz(CP, binned_z(nsteps), lastw)
+         call get_wofz(CP, 1/(1+binned_z(nsteps)), lastw)
          rhode = ((1+z)/(1+binned_z(nsteps)))**(3*(1+lastw))*ispline(binned_z(nsteps), binned_z, rhodeint, b2, c2, d2, nsteps)
       end if
 
