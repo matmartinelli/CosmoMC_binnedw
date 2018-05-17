@@ -14,7 +14,7 @@ use ModelParams
       !initializing global ODE solver parameters from CAMB
       real(dl), parameter :: initial_z = 0._dl
       real(dl) :: final_z
-      integer, parameter  :: nsteps = 10000
+      integer, parameter  :: nsteps = 100000 !enough sampling to have better curve of omega(z)
 
       contains
 
