@@ -34,7 +34,7 @@ use ModelParams
       end if
 
       if (CP%model.eq.theta_bin) then        
-         if (z.gt.CP%zb(CP%nb)) then
+         if (z.ge.CP%zb(CP%nb)) then
             wde = CP%wb(CP%nb)
          else
             wde = CP%wb(1)
