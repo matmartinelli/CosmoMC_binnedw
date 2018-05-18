@@ -4,7 +4,7 @@ use constants
 use ModelParams
 
       implicit none
-      logical, parameter :: debugging = .false.
+      logical, parameter :: debugging = .true.
       real(dl), dimension(:),allocatable :: binned_z, binned_w, rhodeint !output arrays of GP reconstruction
       real(dl), dimension(:),allocatable :: b1, c1, d1                   !coefficients for interpolation
       real(dl), dimension(:),allocatable :: b2, c2, d2                   !coefficients for interpolation
@@ -34,7 +34,7 @@ use ModelParams
       end if
 
       if (CP%model.eq.theta_bin) then        
-         if (z.gt.CP%zb(CP%nb)) then
+         if (z.ge.CP%zb(CP%nb)) then
             wde = CP%wb(CP%nb)
          else
             wde = CP%wb(1)
@@ -47,7 +47,7 @@ use ModelParams
          
 
       else if (CP%model.eq.smooth_bin) then
-         if (z.gt.CP%zb(CP%nb)) then
+         if (z.ge.CP%zb(CP%nb)) then
             wde = CP%wb(CP%nb)
          else
             wde = CP%wb(1)
@@ -72,7 +72,7 @@ use ModelParams
 
       subroutine get_integral_rhode(CP)
       Type(CAMBparams) CP
-      real(dl)              :: wde, rhode0, integral, wplus, wminus
+      real(dl)              :: wde, rhode0, integral, wplus, wminus, wcazzo
       integer,parameter     :: numint=1000, numarr=1000
       real(dl), dimension(numint) :: redint
       integer               :: i,j,k
@@ -101,6 +101,7 @@ use ModelParams
          end do
 
          rhodeint(j) = rhode0*exp(3._dl*integral)
+         call get_wofz(CP,1/(binned_z(j)),wcazzo)
       end do
 
       call newspline(binned_z,rhodeint, b2, c2, d2, nsteps)
@@ -121,7 +122,7 @@ use ModelParams
       if (z.le.binned_z(nsteps)) then
          rhode = ispline(z, binned_z, rhodeint, b2, c2, d2, nsteps)
       else
-         call get_wofz(CP, 1/(1+binned_z(nsteps)), lastw)
+         call get_wofz(CP, binned_z(nsteps), lastw)
          rhode = ((1+z)/(1+binned_z(nsteps)))**(3*(1+lastw))*ispline(binned_z(nsteps), binned_z, rhodeint, b2, c2, d2, nsteps)
       end if
 
