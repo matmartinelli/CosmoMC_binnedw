@@ -47,7 +47,7 @@ use ModelParams
          
 
       else if (CP%model.eq.smooth_bin) then
-         if (z.gt.CP%zb(CP%nb)) then
+         if (z.ge.CP%zb(CP%nb)) then
             wde = CP%wb(CP%nb)
          else
             wde = CP%wb(1)
