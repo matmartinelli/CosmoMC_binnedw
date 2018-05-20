@@ -16,6 +16,10 @@
     use szcounts !Anna
     use wl
     use ElementAbundances
+!FGmod-------
+    use priorwde
+!------------    
+    
     class(TSettingIni), intent(in) :: Ini
 
     CosmoSettings%get_sigma8 = Ini%Read_Logical('get_sigma8',.false.)
@@ -37,6 +41,11 @@
     call SZLikelihood_Add(DataLikelihoods, Ini) !Anna
 
     call WLLikelihood_Add(DataLikelihoods, Ini)
+
+
+!FGmod-------
+    call wLikelihood_Add(DataLikelihoods, Ini)
+!------------
 
     end subroutine SetDataLikelihoods
 
