@@ -1,8 +1,7 @@
     ! covariance matrix from paper 1703.05297v1
 
     module priorwde
-    use CosmologyTypes    	
-    use Calculator_CAMB   !da cui pesco CAMBParams
+    use CosmologyTypes    !da cui pesco CAMBParams
     use Likelihood_Cosmology	!da cui pesco LogLike..
     use MatrixUtils		!per avere l'inversione della matrice di covarianza
     use precision
