@@ -34,28 +34,25 @@
 
     character(LEN=:), allocatable :: data_file
     integer file_unit
-	
-	allocate(this)
-
-	this%n=Ini%Read_Double('numbins')
-!        this%n=nb
-!        if (debugging) write(*,*) 'sono 1'
-
-        if (allocated(this%v_wf) .eqv. .false.) allocate (this%v_w(this%n), this%v_wf(this%n), this%cm(this%n,this%n) , this%inv_cm(this%n,this%n))
-
-!        if (debugging) write(*,*) 'sono 2'
-
-        data_file=Ini%Read_String_Default('data_file',trim(DataDir)//'cov_mat_wde.txt')
-
-        open(newunit=file_unit, file=trim(data_file), status='old')             
-        read(file_unit,*) ((this%cm(i,j), j=1,this%n), i=1,this%n)
-        close(file_unit)
-
-	if (debugging) write(*,*) this%cm
-
-        this%needs_background_functions = .true.
-        call LikeList%Add(this)   !added to the list of likelihoods
     
+	if (Ini%Read_Logical('use_priorwde',.false.)) then	
+		allocate(this)
+
+		this%n=Ini%Read_Double('numbins')
+!        	this%n=nb
+        	if (allocated(this%v_wf) .eqv. .false.) allocate (this%v_w(this%n), this%v_wf(this%n), this%cm(this%n,this%n) , this%inv_cm(this%n,this%n))
+
+	        data_file=Ini%Read_String_Default('data_file',trim(DataDir)//'cov_mat_wde.txt')
+
+        	open(newunit=file_unit, file=trim(data_file), status='old')             
+        	read(file_unit,*) ((this%cm(i,j), j=1,this%n), i=1,this%n)
+        	close(file_unit)
+
+		if (debugging) write(*,*) this%cm
+
+        	this%needs_background_functions = .true.
+        	call LikeList%Add(this)   !added to the list of likelihoods
+    	end if
 
     end subroutine wLikelihood_Add
 
