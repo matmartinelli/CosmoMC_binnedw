@@ -1468,9 +1468,9 @@
         !ppf
         w_eff=w_de(a)   !effective de
 !FGmod-----------------------------------
-	open(8, file='prova_CMB.dat', status='unknown', position='append')
-	write(8,*) a, w_eff, grho_de(a)
-	close(8)
+	!open(8, file='prova_CMB.dat', status='unknown', position='append')
+	!write(8,*) a, w_eff, grho_de(a)
+	!close(8)
 !----------------------------------------
         grhov_t=grho_de(a)/a2
         dgrho=dgrho+EV%dgrho_e_ppf
