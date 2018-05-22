@@ -8,7 +8,7 @@
     implicit none
     private
 
-    logical :: debugging=.true.
+    logical :: debugging=.false.
 
     !likelihood variables
     type, extends(TCosmoCalcLikelihood) :: wLikelihood
@@ -96,6 +96,12 @@
 			chi2 = chi2 + this%v(i)*this%inv_cm(i,j)*this%v(j)
 		end do
 	end do
+
+	if (debugging) then
+		open(78, file='chi2_priorwde.dat', status='unknown', position='append')
+		write(78,*) this%v_w, this%v, chi2
+        	close(78)
+	end if
 
 	w_Lnlike = chi2/2._dl 
 
