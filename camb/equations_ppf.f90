@@ -728,8 +728,10 @@
     end if
     maxeq = maxeq +  (EV%lmaxg+1)+(EV%lmaxnr+1)+EV%lmaxgpol-1
 
-    !Dark energy
-    if (.not. is_cosmological_constant) then
+     !Dark energy
+!FGmod    
+!    if (.not. is_cosmological_constant) then
+     if (.not.((is_cosmological_constant).and.(CP%model.eq.0))) then
         EV%w_ix = neq+1
         neq=neq+1 !ppf
         maxeq=maxeq+1
@@ -790,7 +792,9 @@
 
     yout=0
     yout(1:basic_num_eqns) = y(1:basic_num_eqns)
-    if (.not. is_cosmological_constant) then
+!FGmod    
+!    if (.not. is_cosmological_constant) then
+     if (.not.((is_cosmological_constant).and.(CP%model.eq.0))) then
         yout(EVout%w_ix)=y(EV%w_ix)
     end if
 
@@ -1455,13 +1459,19 @@
 
     !MMmod: binned w
     !WARNING: check if perturbations need to be modified
-!    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
-    if (is_cosmological_constant) then
+    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+!    if (is_cosmological_constant) then
         w_eff = -1_dl
         grhov_t=grhov*a2
     else
+
         !ppf
         w_eff=w_de(a)   !effective de
+!FGmod-----------------------------------
+	open(8, file='prova_CMB.dat', status='unknown', position='append')
+	write(8,*) a, w_eff, grho_de(a)
+	close(8)
+!----------------------------------------
         grhov_t=grho_de(a)/a2
         dgrho=dgrho+EV%dgrho_e_ppf
         dgq=dgq+EV%dgq_e_ppf
@@ -1538,7 +1548,9 @@
     z=(0.5_dl*dgrho/k + etak)/adotoa
     sigma=(z+1.5_dl*dgq/k2)/EV%Kf(1)
 
-    if (is_cosmological_constant) then
+!FGmod-------------------
+    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+!    if (is_cosmological_constant) then
         ppiedot=0
     else
         hdotoh=(-3._dl*grho-3._dl*gpres -2._dl*grhok)/6._dl/adotoa
@@ -1959,7 +1971,9 @@
     y(EV%g_ix)=InitVec(i_clxg)
     y(EV%g_ix+1)=InitVec(i_qg)
 
-    if (.not. is_cosmological_constant) then
+   !FGmod    
+!    if (.not. is_cosmological_constant) then
+     if (.not.((is_cosmological_constant).and.(CP%model.eq.0))) then
         y(EV%w_ix) = InitVec(i_clxq) !ppf: Gamma=0, i_clxq stands for i_Gamma
     end if
 
@@ -2217,8 +2231,10 @@
     grhog_t=grhog/a2
     !MMmod: binned w
     !WARNING: check if perturbations need to be modified
-!    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
-    if (is_cosmological_constant) then
+
+!FGmod-----------------------------------------------------
+    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+!    if (is_cosmological_constant) then
         grhov_t=grhov*a2
         w_eff = -1_dl
     else
@@ -2311,7 +2327,9 @@
 
     ayprime(1)=adotoa*a
 
-    if (.not. is_cosmological_constant) then
+!FGmod    
+!    if (.not. is_cosmological_constant) then
+     if (.not.((is_cosmological_constant).and.(CP%model.eq.0))) then
         !ppf
         grhoT = grho - grhov_t
         vT= dgq/(grhoT+gpres)
@@ -2814,7 +2832,10 @@
     grhoc_t=grhoc/a
     grhor_t=grhornomass/a2
     grhog_t=grhog/a2
-    if (is_cosmological_constant) then
+
+!FGmod--------------------------------------
+    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+!    if (is_cosmological_constant) then
         grhov_t=grhov*a2
     else
         grhov_t=grho_de(a)/a2
