@@ -235,17 +235,16 @@
     !massive neutrinos are initialized and after GetOmegak
     real(dl) red
 
-    is_cosmological_constant = .not. use_tabulated_w .and. w_lam==-1_dl .and. wa_ppf==0._dl
+    !MMmod: w_binned----------------------------------
+    is_cosmological_constant = .not. use_tabulated_w .and. w_lam==-1_dl .and. wa_ppf==0._dl .and. CP%model==0
 
-    !MMmod: w_binned
-    if (CP%model.gt.0) call calc_w_de(CP) 
+    if (CP%model.gt.0) then
+       is_cosmological_constant = .true.
+       if (any(CP%wb.ne.-1._dl)) is_cosmological_constant = .false.
+    end if
 
-!    open(666,file='test.dat')
-!    do i=1, 10000
-!       red = (i-1)*2000._dl/10000._dl
-!       write(666,*) red, w_de(1/(1+red)), grho_de(1/(1+red))
-!    end do
-!    close(666)
+    if (CP%model.gt.0) call calc_w_de(CP)
+    !-------------------------------------------------
     
       
     end  subroutine init_background
