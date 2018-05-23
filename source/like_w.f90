@@ -25,11 +25,11 @@
 
 !...................................................................
 
-    subroutine wLikelihood_Add(LikeList, Ini)
+    subroutine wLikelihood_Add(LikeList, nb, Ini)
     class(TLikelihoodList) :: LikeList
     class(TSettingIni) :: ini
     Type(wLikelihood), pointer :: this
-
+    integer, intent(in) :: nb
     integer :: i, j
 
     character(LEN=:), allocatable :: data_file
