@@ -21,7 +21,10 @@
 !------------    
     
     class(TSettingIni), intent(in) :: Ini
-
+!FGmod-------
+    integer :: init_nbin
+    call Ini%Read('numbins',init_nbin)
+!------------
     CosmoSettings%get_sigma8 = Ini%Read_Logical('get_sigma8',.false.)
 
     call CMBLikelihood_Add(DataLikelihoods, Ini)
@@ -44,7 +47,7 @@
 
 
 !FGmod-------
-    call wLikelihood_Add(DataLikelihoods, Ini)
+    call wLikelihood_Add(DataLikelihoods, init_nbin, Ini)
 !------------
 
     end subroutine SetDataLikelihoods
