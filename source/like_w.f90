@@ -38,8 +38,10 @@
 	if (Ini%Read_Logical('use_priorwde',.false.)) then	
 		allocate(this)
 
-		this%n=Ini%Read_Double('numbins')
-!        	this%n=nb
+        	
+		this%n=nb
+		if (debugging) write(*,*) this%n
+
         	if (allocated(this%v_wf) .eqv. .false.) allocate (this%v_w(this%n), this%v_wf(this%n), this%cm(this%n,this%n) , this%inv_cm(this%n,this%n))
 
 	        data_file=Ini%Read_String_Default('data_file',trim(DataDir)//'cov_mat_wde.txt')
@@ -65,9 +67,6 @@
 
     integer :: i,j
     real :: chi2
-
-!	this%n=CMB%numbins
-
 
 	do i=1,this%n
 		this%v_w(i)=CMB%binw(i)
