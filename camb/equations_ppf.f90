@@ -174,7 +174,9 @@
        endif
     else
        call get_rhode(a,grho_de)
-       grho_de = grho_de*a**4._dl
+       !grho_de is only the time dependent part as it comes out of the subroutine
+       !it needs to be multiplied by grhov to be the quantity used later
+       grho_de = grhov*grho_de*a**4._dl
     end if
     end function grho_de
 

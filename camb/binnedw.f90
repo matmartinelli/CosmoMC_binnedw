@@ -71,8 +71,10 @@ use ModelParams
       end subroutine get_wofz
 
       subroutine get_integral_rhode(CP)
+      !This computes only the time dependent part
+      !The initial value of rhode is added later
       Type(CAMBparams) CP
-      real(dl)              :: wde, rhode0, integral, wplus, wminus, wcazzo
+      real(dl)              :: wde, rhode0, integral, wplus, wminus
       integer,parameter     :: numint=1000, numarr=1000
       real(dl), dimension(numint) :: redint
       integer               :: i,j,k
@@ -100,19 +102,22 @@ use ModelParams
             integral = integral + 0.5*((1+wplus)/(1+redint(i+1))+(1+wminus)/(1+redint(i)))*(binned_z(j)/(numint-1))
          end do
 
-         rhodeint(j) = rhode0*exp(3._dl*integral)
-         call get_wofz(CP,1/(binned_z(j)),wcazzo)
+         rhodeint(j) = exp(3._dl*integral)
       end do
 
       call newspline(binned_z,rhodeint, b2, c2, d2, nsteps)
 
       end subroutine get_integral_rhode
 
-      subroutine get_rhode(a,rhode)
+      subroutine get_rhode(CP,a,rhode)
+      !This gets the whole rhode, but it's used only for testing purposes
+      Type(CAMBparams) CP
       real(dl), intent(in)  :: a
       real(dl), intent(out) :: rhode
-      real(dl)              :: z,lastw
+      real(dl)              :: z,lastw, rhode0
       real(dl), parameter   :: eps=1.e-12 !avoids 1/0
+
+      rhode0=3._dl*((1000*CP%H0/c)**2.)*CP%omegav
 
       if (a.gt.0._dl) then
          z = -1+1._dl/a
@@ -259,7 +264,7 @@ use ModelParams
          do m=1,101
             redshift=(m-1)*10._dl/100
             call get_wofz(CP,1/(1+redshift), wdetest)
-            call get_rhode(1/(1+redshift), rhodetest)
+            call get_rhode(CP,1/(1+redshift), rhodetest)
             omegam = ((3*(1000*CP%H0/c)**2.*(1-CP%omegav)*(1+redshift)**3._dl)/(rhodetest+3*(1000*CP%H0/c)**2.*(1-CP%omegav)*(1+redshift)**3._dl))
             omegade = (rhodetest/(rhodetest+3*(1000*CP%H0/c)**2.*(1-CP%omegav)*(1+redshift)**3._dl))
             write(40,*) redshift, wdetest

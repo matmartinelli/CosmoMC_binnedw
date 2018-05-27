@@ -79,7 +79,7 @@
     !set number of hard parameters, number of initial power spectrum parameters
     !MMmod: binned w------------------------------------------------------
     call this%SetTheoryParameterNumbers(16+2*init_nbin+3,last_power_index)
-    !---------------------------------------------------------------------
+    !--------------------------------------------------------------------- 
 
     end subroutine TP_Init
 
@@ -137,27 +137,44 @@
             call this%TCosmologyParameterization%ParamArrayToTheoryParams(Params, CMB)
 
             error = 0   !JD to prevent stops when using bbn_consistency or m_sterile
-            !MMmod: switching to H0 as primary parameter instead of theta------------------
-!            DA = Params(3)/100
-            try_b = this%H0_max
+            DA = Params(3)/100
+            try_b = this%H0_min
             call SetForH(Params,CMB,try_b, .true.,error)  !JD for bbn related errors
             if(error/=0)then
                 cmb%H0=0
                 return
             end if
-            !!call InitCAMB(CMB,error)
-            if (CMB%tau==0._mcp) then
-               CMB%zre=0
+            D_b = CosmoCalc%CMBToTheta(CMB)
+            try_t = this%H0_max
+            call SetForH(Params,CMB,try_t, .false.)
+            D_t = CosmoCalc%CMBToTheta(CMB)
+            if (DA < D_b .or. DA > D_t) then
+                if (Feedback>1) write(*,*) instance, 'Out of range finding H0: ', real(Params(3))
+                cmb%H0=0 !Reject it
             else
-               CMB%zre = CosmoCalc%GetZreFromTau(CMB, CMB%tau)
+                lasttry = -1
+                do
+                    call SetForH(Params,CMB,(try_b+try_t)/2, .false.)
+                    D_try = CosmoCalc%CMBToTheta(CMB)
+                    if (D_try < DA) then
+                        try_b = (try_b+try_t)/2
+                    else
+                        try_t = (try_b+try_t)/2
+                    end if
+                    if (abs(D_try - lasttry)< 1e-7) exit
+                    lasttry = D_try
+                end do
+
+                !!call InitCAMB(CMB,error)
+                if (CMB%tau==0._mcp) then
+                    CMB%zre=0
+                else
+                    CMB%zre = CosmoCalc%GetZreFromTau(CMB, CMB%tau)
+                end if
+
+                LastCMB(cache) = CMB
+                cache = mod(cache,ncache)+1
             end if
-
-
-            !MMmod: computing theta as derived, will be passed to derived(1) in place of H0
-            CMB%thetaCMB = CosmoCalc%CMBToTheta(CMB)*100
-            LastCMB(cache) = CMB
-            cache = mod(cache,ncache)+1
-            !------------------------------------------------------------------------------
         end select
         class default
         call MpiStop('CosmologyParameterizations: Calculator is not TCosmologyCalculator')
@@ -196,9 +213,7 @@
 
         call this%ParamArrayToTheoryParams(P,CMB)
 
-        !MMmod: gets theta as derived instead of H0
-        derived(1) = CMB%thetaCMB!CMB%H0
-        !------------------------------------------
+        derived(1) = CMB%H0
         derived(2) = CMB%omv
         derived(3) = CMB%omdm+CMB%omb
         derived(4) = CMB%omdmh2 + CMB%ombh2
@@ -274,20 +289,17 @@
     end subroutine SetFast
 
     subroutine SetForH(Params,CMB,H0, firsttime,error)
-    !MMmod: it now read H0 instead of theta
     use bbn
     real(mcp) Params(num_Params)
     logical, intent(in) :: firsttime
     Type(CMBParams) CMB
     real(mcp) h2,H0
     integer, optional :: error
-    integer :: i,j !MMmod: added for binned w
 
     CMB%H0=H0
     if (firsttime) then
         CMB%reserved = 0
         CMB%ombh2 = Params(1)
-        CMB%H0 = Params(3) !MMmod: now read H0 instead of theta
         CMB%tau = params(4) !tau, set zre later
         CMB%Omk = Params(5)
         CMB%w = Params(8)
@@ -341,6 +353,7 @@
         CMB%smoothfactor= Params(16+j+2)
         CMB%mode        = Params(16+j+3)
         !----------------------------------------------------------------------------------
+
         call SetFast(Params,CMB)
     end if
 
