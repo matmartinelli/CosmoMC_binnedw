@@ -109,15 +109,13 @@ use ModelParams
 
       end subroutine get_integral_rhode
 
-      subroutine get_rhode(CP,a,rhode)
+      subroutine get_rhode(a,rhode)
       !This gets the whole rhode, but it's used only for testing purposes
-      Type(CAMBparams) CP
       real(dl), intent(in)  :: a
       real(dl), intent(out) :: rhode
       real(dl)              :: z,lastw, rhode0
       real(dl), parameter   :: eps=1.e-12 !avoids 1/0
 
-      rhode0=3._dl*((1000*CP%H0/c)**2.)*CP%omegav
 
       if (a.gt.0._dl) then
          z = -1+1._dl/a
@@ -151,7 +149,7 @@ use ModelParams
       integer :: getpid
       integer :: system
       integer :: i,m,nlbins
-      real(dl) :: redshift, wdetest, rhodetest, omegam, omegade
+      real(dl) :: redshift, wdetest, rhodetest, omegam, omegade,rhode0
 
 
       final_z   = CP%zb(CP%nb)
@@ -264,7 +262,9 @@ use ModelParams
          do m=1,101
             redshift=(m-1)*10._dl/100
             call get_wofz(CP,1/(1+redshift), wdetest)
-            call get_rhode(CP,1/(1+redshift), rhodetest)
+            call get_rhode(1/(1+redshift), rhodetest)
+            rhode0=3._dl*((1000*CP%H0/c)**2.)*CP%omegav
+            rhodetest = rhode0*rhodetest
             omegam = ((3*(1000*CP%H0/c)**2.*(1-CP%omegav)*(1+redshift)**3._dl)/(rhodetest+3*(1000*CP%H0/c)**2.*(1-CP%omegav)*(1+redshift)**3._dl))
             omegade = (rhodetest/(rhodetest+3*(1000*CP%H0/c)**2.*(1-CP%omegav)*(1+redshift)**3._dl))
             write(40,*) redshift, wdetest

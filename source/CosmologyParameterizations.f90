@@ -295,6 +295,7 @@
     Type(CMBParams) CMB
     real(mcp) h2,H0
     integer, optional :: error
+    integer :: i,j,k !MMmod: indexes
 
     CMB%H0=H0
     if (firsttime) then
