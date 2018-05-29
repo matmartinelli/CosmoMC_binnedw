@@ -202,6 +202,11 @@ endif
 
 default: cosmomc
 
+#FGmod------------------------
+$(OUTPUT_DIR)/like_w.o: $(OUTPUT_DIR)/Likelihood_Cosmology.o
+DATAMODULES += $(OUTPUT_DIR)/like_w.o
+#---------------------------------
+
 $(OUTPUT_DIR)/StringUtils.o: $(OUTPUT_DIR)/MiscUtils.o
 $(OUTPUT_DIR)/RandUtils.o: $(OUTPUT_DIR)/MpiUtils.o
 $(OUTPUT_DIR)/FileUtils.o: $(OUTPUT_DIR)/MpiUtils.o $(OUTPUT_DIR)/MiscUtils.o $(OUTPUT_DIR)/StringUtils.o

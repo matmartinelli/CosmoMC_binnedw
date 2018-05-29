@@ -125,7 +125,7 @@ use ModelParams
       if (z.le.binned_z(nsteps)) then
          rhode = ispline(z, binned_z, rhodeint, b2, c2, d2, nsteps)
       else
-         call get_wofz(CP, binned_z(nsteps), lastw)
+         call get_wofz(CP, 1/(1+binned_z(nsteps)), lastw)
          rhode = ((1+z)/(1+binned_z(nsteps)))**(3*(1+lastw))*ispline(binned_z(nsteps), binned_z, rhodeint, b2, c2, d2, nsteps)
       end if
 
