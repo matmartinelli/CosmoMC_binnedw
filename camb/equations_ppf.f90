@@ -282,7 +282,9 @@
 
 !    open(46,file='test_dtauda.dat', position='append')	
     !MMmod: binned w
-    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+    !if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+!FGmod
+    if (is_cosmological_constant) then
        grhoa2=grhoa2+grhov*a2**2
     else
 !       if (z < 2._dl) then 
@@ -1459,8 +1461,9 @@
 
     !MMmod: binned w
     !WARNING: check if perturbations need to be modified
-    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
-!    if (is_cosmological_constant) then
+!    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+!FGmod
+    if (is_cosmological_constant) then
         w_eff = -1_dl
         grhov_t=grhov*a2
     else
@@ -2221,8 +2224,9 @@
     grhog_t=grhog/a2
     !MMmod: binned w
     !WARNING: check if perturbations need to be modified
-    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
-!    if (is_cosmological_constant) then
+!    if ((is_cosmological_constant).and.(CP%model.eq.0)) then
+!FGmod
+    if (is_cosmological_constant) then
         grhov_t=grhov*a2
         w_eff = -1_dl
     else
