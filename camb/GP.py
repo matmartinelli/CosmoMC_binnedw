@@ -49,11 +49,6 @@ nb=len(wde)
 #defining the baseline -1
 base = lambda x: -1+x-x
 
-for i in range (nb):
-	wde[i]= wde[i]+ base(z[i])
-
-
-
 # Generation of the Gaussian Process
 gp = GaussianProcessRegressor(kernel=RBF(l, (l, l)))
 
