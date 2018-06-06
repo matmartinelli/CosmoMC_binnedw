@@ -12,10 +12,10 @@
 
     !likelihood variables
     type, extends(TCosmoCalcLikelihood) :: wLikelihood
-	real(dl), dimension(:),allocatable :: v_w, v_wf, v, zb
-	real(dl), dimension(:,:),allocatable :: cm, inv_cm
-	integer :: n
-        real :: xi, expo
+        integer  :: prior_shape                          !shape of theoretical prior
+        integer  :: modelclass                           !assumed model
+        real(dl) :: prior_n, prior_xi                    !correlation parameters
+        real(dl) :: prior_alpha, prior_beta, prior_gamma !auto-correlation parameters
     contains
 
     procedure :: LogLikeDataParams => w_LnLike
@@ -26,7 +26,7 @@
 
 !...................................................................
 
-    subroutine wLikelihood_Add(LikeList, nb, zbins, l, Ini)
+    subroutine wLikelihood_Add(LikeList, Ini)
     class(TLikelihoodList) :: LikeList
     class(TSettingIni) :: ini
     Type(wLikelihood), pointer :: this
@@ -38,31 +38,25 @@
     character(LEN=:), allocatable :: data_file
     integer file_unit
     
-	if (Ini%Read_Logical('use_priorwde',.false.)) then	
-		allocate(this)
-  	
-		this%n=nb
-		if (debugging) write(*,*) 'numero di bin', this%n
-                this%zb=zbins
-		if (debugging) write(*,*) 'array redshift binnati', this%zb
-		this%xi=l
-		if (debugging) write(*,*) 'valore di xi', this%xi     !att. assunto essere uguale a correlation lenght in ingresso
-		this%expo=2
-		if (debugging) write(*,*) 'valore esponente nella matrice', this%expo      !capire che esponente dare
-                
-        	if (allocated(this%v_wf) .eqv. .false.) allocate (this%v_w(this%n), this%v_wf(this%n), this%cm(this%n,this%n) , this%inv_cm(this%n,this%n))
+    if (Ini%Read_Logical('use_priorwde',.false.)) then
+       allocate(this)
 
-		do i=1,this%n
-			do j=1,this%n
-				this%cm(i,j) = 1._dl/(1+((sign(this%zb(i)-this%zb(j),0.9_dl)/this%xi)**this%expo))
-			end do
-		end do
+       !READING PRIOR SETTINGS
+       this%prior_shape = Ini%Read_Int('prior_shape')
+       this%modelclass  = Ini%Read_Int('theory_model')
 
-		if (debugging) write(*,*) this%cm
+       !READING CORRELATION PARAMETERS
+       this%prior_n     = Ini%Read_Double('prior_n')
+       this%prior_xi    = Ini%Read_Double('prior_xi')
 
-        	this%needs_background_functions = .true.
-        	call LikeList%Add(this)   !added to the list of likelihoods
-    	end if
+       !READING AUTO CORRELATION PARAMETERS
+       this%prior_alpha = Ini%Read_Double('prior_alpha')
+       this%prior_beta  = Ini%Read_Double('prior_beta')
+       this%prior_gamma = Ini%Read_Double('prior_gamma')
+
+       this%needs_background_functions = .true.
+       call LikeList%Add(this)   !added to the list of likelihoods
+    end if
 
     end subroutine wLikelihood_Add
 
@@ -75,50 +69,90 @@
 
     integer :: i,j
     real :: chi2, mean
+    real(dl), dimension(CMB%numbins)             :: diff_vec
+    real(dl), dimension(CMB%numbins,CMB%numbins) :: covmat, inv_covmat
+    real(dl), dimension(CMB%numbins)             :: autocorr
+    real(dl)                                     :: distance, autodist
+    integer, parameter                           :: exp_prior=1, CPZ_prior=2
+    integer, parameter                           :: quintessence=1, GBD=2, horndeski=3
 
-        mean=0
-	do i=1,this%n
-		mean=mean+CMB%binw(i)
-	end do
-	mean=mean/this%n
-	if (debugging) write(*,*) 'valore fiduciale', mean
-	
-	do i=1,this%n
-		this%v_w(i)=CMB%binw(i)
-		this%v_wf(i)=mean
-	end do
+    mean=0
 
-	if (debugging) write(*,*) 'la dimensione dei vettori e', this%n
-	if (debugging) write(*,*) 'il vettore v_w', this%v_w
-        if (debugging) write(*,*) 'il vettore v_wfid', this%v_wf
+    !COMPUTING MEAN OF W_I VALUES-----------
+    do i=1,CMB%numbins
+       mean=mean+CMB%binw(i)
+    end do
+    mean=mean/CMB%numbins
+    if (debugging) write(*,*) 'valore fiduciale', mean
 
-!	if (debugging) write(*,*) 'la matrice e', this%cm
 
-        if (allocated(this%v) .eqv. .false.) allocate (this%v(CMB%numbins))
-	do i=1,CMB%numbins
-		this%v(i) = this%v_w(i)-this%v_wf(i)
-        end do
+    if (debugging) write(*,*) 'la dimensione dei vettori e', CMB%numbins
+    if (debugging) write(*,*) 'il vettore v_w', CMB%binw(i)
+    if (debugging) write(*,*) 'il vettore v_wfid', mean
 
-        chi2 = 0._dl
+    if (debugging) write(*,*) 'la matrice e', covmat
 
-	!definisco la matrice inversa tramite la subroutine Matrix_Inverse(M) :: RICORDA utilizzabile se matrice simmetrica definita positiva
-        this%inv_cm = this%cm
-	call Matrix_Inverse(this%inv_cm)   
-!	call Matrix_InverseAsymm(this%inv_cm)
+    !COMPUTING ARRAY OF w_i-mean
+    do i=1,CMB%numbins
+       diff_vec(i) = CMB%binw(i)-mean
+    end do
 
-	do i=1,CMB%numbins
-		do j=1,CMB%numbins
-			chi2 = chi2 + this%v(i)*this%inv_cm(i,j)*this%v(j)
-		end do
-	end do
+    !COMPUTING AUTOCORRELATION
+    do i=1,CMB%numbins
+       if (this%modelclass.eq.quintessence) then
+          autodist = -1._dl+1._dl/(1+CMB%binz(i))
+       else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
+          autodist = log(1._dl/(1+CMB%binz(i)))
+       else
+          write(*,*) 'MODEL CHOICE 1-3'
+          write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+          stop
+       end if
+       autocorr(i) = this%prior_alpha+this%prior_beta*exp(this%prior_gamma*autodist)   
+    end do
 
-	if (debugging) then
-		open(78, file='chi2_priorwde.dat', status='unknown', position='append')
-		write(78,*) this%v_w, this%v, chi2
-        	close(78)
-	end if
+    !COMPUTING COV MAT AND ITS INVERSE
+    if (this%prior_shape.eq.exp_prior) then
+       write(*,*) 'NOTHING HERE YET, COME BACK LATER!'
+       stop
+    else if (this%prior_shape.eq.CPZ_prior) then
+       do i=1,CMB%numbins
+          do j=1,CMB%numbins
+             if (this%modelclass.eq.quintessence) then
+                distance = abs((1./(1+CMB%binz(i)))-(1./(1+CMB%binz(j))))
+             else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
+                distance = abs(log(1./(1+CMB%binz(i)))-log(1./(1+CMB%binz(j))))
+             else
+                write(*,*) 'MODEL CHOICE 1-3'
+                write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+                stop
+             end if
+             covmat(i,j) = sqrt(autocorr(i)*autocorr(j))*1._dl/(1+((distance/this%prior_xi)**this%prior_n))
+          end do
+       end do
+    else
+       write(*,*) 'BAD CHOICE OF PRIOR'
+       write(*,*) 'CHOOSE AN EXISTING ONE!!!'
+       stop
+    end if
 
-	w_Lnlike = chi2/2._dl 
+    inv_covmat(:,:) = covmat(:,:)
+    call Matrix_Inverse(inv_covmat)
+
+    !COMPUTING CHI2
+    chi2 = 0._dl
+
+    chi2 = dot_product( diff_vec, MatMul(inv_covmat,diff_vec))
+
+    if (debugging) then
+       open(78, file='chi2_priorwde.dat', status='unknown', position='append')
+       write(78,*) CMB%binw, diff_vec, chi2
+       close(78)
+    end if
+
+    w_Lnlike = chi2/2._dl 
+
+    if (feedback.gt.0) write(*,*) 'Prior Like =', w_Lnlike
 
     end function  w_LnLike
 
