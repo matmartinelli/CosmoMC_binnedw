@@ -105,10 +105,7 @@
     end do
 
     !COMPUTING COV MAT AND ITS INVERSE
-    if (this%prior_shape.eq.exp_prior) then
-       write(*,*) 'NOTHING HERE YET, COME BACK LATER!'
-       stop
-    else if (this%prior_shape.eq.CPZ_prior) then
+    if ((this%prior_shape.eq.CPZ_prior).or.(this%prior_shape.eq.exp_prior)) then
        do i=1,CMB%numbins
           do j=1,CMB%numbins
              if (this%modelclass.eq.quintessence) then
@@ -120,7 +117,11 @@
                 write(*,*) 'YOUR CHOICE DOES NOT EXIST'
                 stop
              end if
-             covmat(i,j) = sqrt(autocorr(i)*autocorr(j))*1._dl/(1+((distance/this%prior_xi)**this%prior_n))
+	     if (this%prior_shape.eq.CPZ_prior) then
+             	covmat(i,j) = sqrt(autocorr(i)*autocorr(j))*1._dl/(1+((distance/this%prior_xi)**this%prior_n))
+	     else
+		covmat(i,j) = sqrt(autocorr(i)*autocorr(j))*exp(-((distance/this%prior_xi)**this%prior_n))
+	     end if
           end do
        end do
     else
