@@ -30,13 +30,6 @@
     class(TLikelihoodList) :: LikeList
     class(TSettingIni) :: ini
     Type(wLikelihood), pointer :: this
-    integer, intent(in) :: nb
-    real, intent(in) :: l
-    real, intent(in), dimension(nb) :: zbins
-    integer :: i, j
-
-    character(LEN=:), allocatable :: data_file
-    integer file_unit
     
     if (Ini%Read_Logical('use_priorwde',.false.)) then
        allocate(this)
