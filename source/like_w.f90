@@ -47,29 +47,29 @@
        if ((this%prior_shape.eq.CPZ_prior).or.(this%prior_shape.eq.exp_prior)) then
           if (this%prior_shape.eq.exp_prior) then
               if (this%modelclass.eq.quintessence) then
-	   	this%prior_n     = 1.8
-	        this%prior_xi    = 0.7
+	   	   this%prior_n     = 1.8
+	           this%prior_xi    = 0.7
               else if (this%modelclass.eq.GBD) then
-		this%prior_n     = 1.3
-	        this%prior_xi    = 0.3
+		   this%prior_n     = 1.3
+	           this%prior_xi    = 0.3
 	      else if (this%modelclass.eq.horndeski) then
-		this%prior_n     = 1.2
-	        this%prior_xi    = 0.3
+		   this%prior_n     = 1.2
+	           this%prior_xi    = 0.3
 	      else 
-                write(*,*) 'MODEL CHOICE 1-3'
-	        write(*,*) 'YOUR CHOICE DOES NOT EXIST'
-	        stop
+                   write(*,*) 'MODEL CHOICE 1-3'
+	           write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+	           stop
               end if
           else
 	      this%prior_n=2
               if (this%modelclass.eq.quintessence) then
-	 	this%prior_xi    = 0.6
+	 	   this%prior_xi    = 0.6
               else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
-                this%prior_xi    = 0.2
+                   this%prior_xi    = 0.2
               else 
-                write(*,*) 'MODEL CHOICE 1-3'
-	        write(*,*) 'YOUR CHOICE DOES NOT EXIST'
-	        stop
+                   write(*,*) 'MODEL CHOICE 1-3'
+	           write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+	           stop
               end if
           end if
        else
@@ -81,21 +81,21 @@
 
        !AUTOCORRELATION PARAMETERS
        if (this%modelclass.eq.quintessence) then
-      	this%prior_alpha = 0.03
-        this%prior_beta  = 0.3
-        this%prior_gamma = 6.5
+      	   this%prior_alpha = 0.03
+           this%prior_beta  = 0.3
+           this%prior_gamma = 6.5
        else if (this%modelclass.eq.GBD) then
-	this%prior_alpha = 0.05
-        this%prior_beta  = 0.8
-        this%prior_gamma = 1.8
+	   this%prior_alpha = 0.05
+           this%prior_beta  = 0.8
+           this%prior_gamma = 1.8
        else if (this%modelclass.eq.horndeski) then
-	this%prior_alpha = 0.05
-        this%prior_beta  = 0.8
-        this%prior_gamma = 2
+	   this%prior_alpha = 0.05
+           this%prior_beta  = 0.8
+           this%prior_gamma = 2
        else 
-        write(*,*) 'MODEL CHOICE 1-3'
-        write(*,*) 'YOUR CHOICE DOES NOT EXIST'
-        stop
+           write(*,*) 'MODEL CHOICE 1-3'
+           write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+           stop
        end if
 
        !PRINTING MODELS AND PARAMETERS
