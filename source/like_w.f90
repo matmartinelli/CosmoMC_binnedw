@@ -9,13 +9,14 @@
     private
 
     logical :: debugging=.false.
+    logical :: debugging_paramsprior=.true.
 
     !likelihood variables
     type, extends(TCosmoCalcLikelihood) :: wLikelihood
         integer  :: prior_shape                          !shape of theoretical prior
         integer  :: modelclass                           !assumed model
-        real(dl) :: prior_n, prior_xi                    !correlation parameters
-        real(dl) :: prior_alpha, prior_beta, prior_gamma !auto-correlation parameters
+        real :: prior_n, prior_xi                    !correlation parameters
+        real :: prior_alpha, prior_beta, prior_gamma !auto-correlation parameters
     contains
 
     procedure :: LogLikeDataParams => w_LnLike
@@ -30,6 +31,9 @@
     class(TLikelihoodList) :: LikeList
     class(TSettingIni) :: ini
     Type(wLikelihood), pointer :: this
+    integer, parameter                           :: exp_prior=1, CPZ_prior=2
+    integer, parameter                           :: quintessence=1, GBD=2, horndeski=3
+
     
     if (Ini%Read_Logical('use_priorwde',.false.)) then
        allocate(this)
@@ -38,14 +42,74 @@
        this%prior_shape = Ini%Read_Int('prior_shape')
        this%modelclass  = Ini%Read_Int('theory_model')
 
-       !READING CORRELATION PARAMETERS
-       this%prior_n     = Ini%Read_Double('prior_n')
-       this%prior_xi    = Ini%Read_Double('prior_xi')
 
-       !READING AUTO CORRELATION PARAMETERS
-       this%prior_alpha = Ini%Read_Double('prior_alpha')
-       this%prior_beta  = Ini%Read_Double('prior_beta')
-       this%prior_gamma = Ini%Read_Double('prior_gamma')
+       !CORRELATION PARAMETERS
+       if ((this%prior_shape.eq.CPZ_prior).or.(this%prior_shape.eq.exp_prior)) then
+          if (this%prior_shape.eq.exp_prior) then
+              if (this%modelclass.eq.quintessence) then
+	   	this%prior_n     = 1.8
+	        this%prior_xi    = 0.7
+              else if (this%modelclass.eq.GBD) then
+		this%prior_n     = 1.3
+	        this%prior_xi    = 0.3
+	      else if (this%modelclass.eq.horndeski) then
+		this%prior_n     = 1.2
+	        this%prior_xi    = 0.3
+	      else 
+                write(*,*) 'MODEL CHOICE 1-3'
+	        write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+	        stop
+              end if
+          else
+	      this%prior_n=2
+              if (this%modelclass.eq.quintessence) then
+	 	this%prior_xi    = 0.6
+              else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
+                this%prior_xi    = 0.2
+              else 
+                write(*,*) 'MODEL CHOICE 1-3'
+	        write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+	        stop
+              end if
+          end if
+       else
+          write(*,*) 'BAD CHOICE OF PRIORSHAPE'
+          write(*,*) 'CHOOSE AN EXISTING ONE!!!'
+          stop
+       end if
+
+
+       !AUTOCORRELATION PARAMETERS
+       if (this%modelclass.eq.quintessence) then
+      	this%prior_alpha = 0.03
+        this%prior_beta  = 0.3
+        this%prior_gamma = 6.5
+       else if (this%modelclass.eq.GBD) then
+	this%prior_alpha = 0.05
+        this%prior_beta  = 0.8
+        this%prior_gamma = 1.8
+       else if (this%modelclass.eq.horndeski) then
+	this%prior_alpha = 0.05
+        this%prior_beta  = 0.8
+        this%prior_gamma = 2
+       else 
+        write(*,*) 'MODEL CHOICE 1-3'
+        write(*,*) 'YOUR CHOICE DOES NOT EXIST'
+        stop
+       end if
+
+       !PRINTING MODELS AND PARAMETERS
+       if (debugging_paramsprior) then 
+	   write(*,*) 'prior', this%prior_shape
+	   write(*,*) 'model', this%modelclass
+	   write(*,*) 'prior_n', this%prior_n
+	   write(*,*) 'prior_xi', this%prior_xi
+	   write(*,*) 'prior_alpha', this%prior_alpha
+	   write(*,*) 'prior_beta', this%prior_beta
+	   write(*,*) 'prior_gamma', this%prior_gamma
+       end if
+
+
 
        this%needs_background_functions = .true.
        call LikeList%Add(this)   !added to the list of likelihoods
@@ -69,6 +133,7 @@
     integer, parameter                           :: exp_prior=1, CPZ_prior=2
     integer, parameter                           :: quintessence=1, GBD=2, horndeski=3
 
+
     mean=0
 
     !COMPUTING MEAN OF W_I VALUES-----------
@@ -89,6 +154,7 @@
     do i=1,CMB%numbins
        diff_vec(i) = CMB%binw(i)-mean
     end do
+
 
     !COMPUTING AUTOCORRELATION
     do i=1,CMB%numbins
