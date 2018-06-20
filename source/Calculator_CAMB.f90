@@ -108,6 +108,7 @@
 
     !MMmod: binned w ----------------------------
     P%nb=CMB%numbins
+    P%w0=CMB%binw0
     if (.not.allocated(P%zb)) allocate(P%zb(P%nb),P%wb(P%nb))
     do i=1,P%nb
        P%zb(i) = CMB%binz(i)

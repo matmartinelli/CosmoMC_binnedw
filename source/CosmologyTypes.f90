@@ -121,6 +121,7 @@
         real(mcp) :: thetaCMB !MMmod: added to use theta as derived parameter instead of H0
         !MMmod: binned w------------------------------------
         real(mcp), dimension(:), allocatable ::   binz, binw
+        real(mcp) :: binw0
         real    ::   corr_l
         integer :: smoothfactor,mode, numbins
         !---------------------------------------------------

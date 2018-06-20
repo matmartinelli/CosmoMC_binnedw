@@ -78,7 +78,7 @@
     this%num_derived = Names%num_derived
     !set number of hard parameters, number of initial power spectrum parameters
     !MMmod: binned w------------------------------------------------------
-    call this%SetTheoryParameterNumbers(16+2*init_nbin+3,last_power_index)
+    call this%SetTheoryParameterNumbers(16+1+2*init_nbin+3,last_power_index)
     !--------------------------------------------------------------------- 
 
     end subroutine TP_Init
@@ -342,17 +342,17 @@
         !MMmod: binned w-------------------------------------------------------------------
         CMB%numbins = init_nbin
         if (.not.allocated(CMB%binz)) allocate(CMB%binz(CMB%numbins),CMB%binw(CMB%numbins))
-
+        CMB%binw0 = Params(17)
         j=1
         do i=1,CMB%numbins
-           CMB%binz(i) = Params(16+j)
-           CMB%binw(i) = Params(16+j+1)
+           CMB%binz(i) = Params(17+j)
+           CMB%binw(i) = Params(17+j+1)
            j = j+2
         end do
         j = j-1
-        CMB%corr_l = Params(16+j+1)
-        CMB%smoothfactor= Params(16+j+2)
-        CMB%mode        = Params(16+j+3)
+        CMB%corr_l = Params(17+j+1)
+        CMB%smoothfactor= Params(17+j+2)
+        CMB%mode        = Params(17+j+3)
         !----------------------------------------------------------------------------------
 
         call SetFast(Params,CMB)

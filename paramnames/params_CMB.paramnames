@@ -14,6 +14,7 @@ deltazrei     {\Delta}z_{\rm re} #width of reionization
 Alens         A_{L}     #lensing potential scaled by sqrt(A_lens)
 Alensf        A^f_L     #amplitude of smoothing power from fiducial models 
 fdm           \epsilon_0 f_d    #CosmoRec dark matter annihilation parameter, 0910.3663
+binw0         w0
 binz1         z1
 binw1         w1
 binz2         z2
