@@ -171,7 +171,7 @@
           autodist = -1._dl+(1._dl/(1+gpreds(i)))
           write(*,*) 'quintessence autodistance', autodist
        else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
-          autodist = log(1._dl/(1+CMB%binz(i)))
+          autodist = log(1._dl/(1+gpreds(i)))
           write(*,*) 'horndeski autodistance', autodist
        else
           write(*,*) 'MODEL CHOICE 1-3'
@@ -191,7 +191,7 @@
                 distance = abs((1./(1+gpreds(i)))-(1./(1+gpreds(j))))
                 write(*,*) 'quintessence distance', distance
              else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
-                distance = abs(log(1./(1+CMB%binz(i)))-log(1./(1+CMB%binz(j))))
+                distance = abs(log(1./(1+gpreds(i)))-log(1./(1+gpreds(i))))
                 write(*,*) 'horndeski distance', distance
              else
                 write(*,*) 'MODEL CHOICE 1-3'
