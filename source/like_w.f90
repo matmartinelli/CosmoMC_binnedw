@@ -204,7 +204,7 @@
                 write(*,*) 'CPZ C',i,j, covmat(i,j)
 	     else
 		covmat(i,j) = sqrt(autocorr(i)*autocorr(j))*exp(-((distance/this%prior_xi)**this%prior_n))
-                write(*,*) 'exp Cor',i,j, 1._dl/(1+((distance/this%prior_xi)**this%prior_n))
+                write(*,*) 'exp Cor',i,j, exp(-((distance/this%prior_xi)**this%prior_n))
                 write(*,*) 'exp C',i,j, covmat(i,j)
 	     end if
           end do
