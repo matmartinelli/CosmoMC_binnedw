@@ -191,7 +191,7 @@
                 distance = abs((1./(1+gpreds(i)))-(1./(1+gpreds(j))))
                 write(*,*) 'quintessence distance', distance
              else if ((this%modelclass.eq.GBD).or.(this%modelclass.eq.horndeski)) then
-                distance = abs(log(1./(1+gpreds(i)))-log(1./(1+gpreds(i))))
+                distance = abs(log(1./(1+gpreds(i)))-log(1./(1+gpreds(j))))
                 write(*,*) 'horndeski distance', distance
              else
                 write(*,*) 'MODEL CHOICE 1-3'
