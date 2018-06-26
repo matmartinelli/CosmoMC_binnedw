@@ -165,7 +165,7 @@
     
     
     !COMPUTING MEAN OF W_I VALUES-----------
-    wfid(1) = (wi(1)+wi(2)+(-1))/3
+    wfid(1) = (wi(1)+wi(2))/2
     do i=2,d
        wfid(i)=(wi(i-1)+wi(i)+wi(i+1))/3
     end do
@@ -251,7 +251,11 @@
 	do i=1,d
 		do j=1,d
                         if (debugging) write(*,*) 'elemento', i, j, 'del chi2', diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
-			chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
+                        if (j.eq.i) then
+			    chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)/2._dl
+                        else
+                            chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
+                        end if
 		end do
 	end do
 
