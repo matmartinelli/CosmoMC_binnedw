@@ -246,18 +246,18 @@
     !COMPUTING CHI2
     chi2 = 0._dl
 
-!    chi2 = dot_product( diff_vec, MatMul(inv_covmat,diff_vec))
+    chi2 = dot_product( diff_vec, MatMul(inv_covmat,diff_vec))
 
-	do i=1,d
-		do j=1,d
-                        if (debugging) write(*,*) 'elemento', i, j, 'del chi2', diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
-                        if (j.eq.i) then
-			    chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)/2._dl
-                        else
-                            chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
-                        end if
-		end do
-	end do
+!	do i=1,d
+!		do j=1,d
+!                        if (debugging) write(*,*) 'elemento', i, j, 'del chi2', diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
+!                        if (j.eq.i) then
+!			    chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)/2._dl
+!                        else
+!                            chi2 = chi2 + diff_vec(i)*inv_covmat(i,j)*diff_vec(j)
+!                        end if
+!		end do
+!	end do
 
 !    if (debugging) then
 !       open(78, file='chi2_priorwde.dat', status='unknown', position='append')
