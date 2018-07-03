@@ -154,9 +154,10 @@
            wi(i+1)=CMB%binw(i)
         end do
         gpreds(1) = 0
-        do i=1, CMB%numbins
-           gpreds(i+1) = (CMB%binz(i)+CMB%binz(i-1))/2.
-        end do
+	gpreds(2) = (1._dl + CMB%binz(1))/2
+         do i=2,CMB%numbins
+            gpa(i+1) = (CMB%binz(i-1)+CMB%binz(i))/2.
+         end do
     end if
 
 
