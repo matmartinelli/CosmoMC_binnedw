@@ -153,7 +153,7 @@ use ModelParams
       real(dl) :: redshift, wdetest, rhodetest, omegam, omegade,rhode0
 
 
-      final_z   = CP%zb(CP%nb)
+      
 
       !allocating arrays
       if (allocated(binned_z) .eqv. .false.) allocate (binned_z(nsteps),binned_w(nsteps), rhodeint(nsteps))
@@ -182,7 +182,7 @@ use ModelParams
             gpreds(i) = (CP%zb(i)+CP%zb(i-1))/2.
          end do
 
-
+         final_z   = CP%gpreds(CP%nb)
 
          !Creating command line
 
