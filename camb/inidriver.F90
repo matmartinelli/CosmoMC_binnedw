@@ -127,7 +127,7 @@
 
 
     P%nb = Ini_Read_Int('num_bins',1)
-    P%w0 = Ini_Read_Int('bin_w_0',0._dl)
+    P%w0 = Ini_Read_Double('bin_w_0',0._dl)
     if (.not.allocated(P%zb)) allocate(P%zb(P%nb),P%wb(P%nb))
     do i=1,P%nb
        write(binnum,*) i
