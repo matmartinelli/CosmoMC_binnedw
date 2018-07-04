@@ -182,7 +182,7 @@ use ModelParams
             gpreds(i) = (CP%zb(i)+CP%zb(i-1))/2.
          end do
 
-         final_z   = CP%gpreds(CP%nb)
+         final_z   = gpreds(CP%nb)
 
          !Creating command line
 
