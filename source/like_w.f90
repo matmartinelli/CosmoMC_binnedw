@@ -156,7 +156,7 @@
         gpreds(1) = 0
 	gpreds(2) = (1._dl + CMB%binz(1))/2
          do i=2,CMB%numbins
-            gpa(i+1) = (CMB%binz(i-1)+CMB%binz(i))/2.
+            gpreds(i+1) = (CMB%binz(i-1)+CMB%binz(i))/2.
          end do
     end if
 
